@@ -1,0 +1,10 @@
+{
+  "speed_mean": 62.619573607986915,
+  "speed_std": 9.594371081990628,
+  "accel_mean": -6.760260153873211e-08,
+  "accel_std": 0.003351096846754538,
+  "sg_filter_applied": true,
+  "sg_window": 13,
+  "sg_poly": 1,
+  "note": "Acceleration was SG filtered BEFORE normalization. Speed std corrected to match raw data."
+}

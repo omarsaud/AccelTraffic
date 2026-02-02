@@ -1,0 +1,47 @@
+# Data files (too large for GitHub)
+*.h5
+*.npy
+*.pkl
+*.pth
+*.pt
+*.ckpt
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyc
+
+# Model checkpoints
+checkpoints/
+saved_models/
+*.pt
+*.pth
+
+# Logs
+*.log
+logs/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Virtual environments
+venv/
+env/
+.env
+
+# Large data directories
+data/metr-la/*.h5
+data/metr-la/*.npy
+data/pems-bay/*.h5
+data/pems-bay/*.npy
