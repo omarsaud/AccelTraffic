@@ -60,7 +60,7 @@ def parse_args():
     
     # Model selection
     parser.add_argument('--model', type=str, required=True,
-                       choices=['stgin', 'dcrnn', 'gwnet', 'agcrn'],
+                       choices=['stgin', 'dcrnn', 'gwnet', 'agcrn', 'staeformer'],
                        help='Model to train')
     
     # Dataset

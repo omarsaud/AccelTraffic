@@ -36,8 +36,8 @@ def create_model(model_name, num_nodes, input_dim=1, output_dim=1,
         # Use testing_withenhancement.py for STGIN experiments
         raise NotImplementedError(
             "STGIN uses a different interface with spatiotemporal embeddings. "
-            "Please use 'testing_withenhancement.py' or 'run_ablation_UNFILTERED.py' "
-            "for STGIN experiments. The multi-model scripts are for DCRNN, GWNet, and AGCRN."
+            "Please use 'train_stgin.py' for STGIN experiments. The multi-model "
+            "script (train_multimodel.py) supports DCRNN, AGCRN, Graph WaveNet, and STAEformer."
         )
         
     elif model_name == 'dcrnn':
@@ -87,88 +87,28 @@ def create_model(model_name, num_nodes, input_dim=1, output_dim=1,
             horizon=prediction_horizon
         )
     
-    elif model_name == 'stgformer_v2':
-        # STGFormer v2: Enhanced version with horizon-aware decoder + temporal conv
-        # Note: STGFormer models not included in AccelTraffic (use main codebase)
-        raise NotImplementedError(
-            "STGFormer models not included in AccelTraffic release. "
-            "AccelTraffic includes only: DCRNN, AGCRN, Graph WaveNet, and STGIN."
-        )
-        num_heads = kwargs.pop('num_heads', 4)
-        num_layers = kwargs.pop('num_layers', 2)
-        k_local = kwargs.pop('k_local', 5)
-        K_global = kwargs.pop('K_global', 20)
-        model = STGFormerV2(
+    elif model_name == 'staeformer':
+        from .staeformer_model import STAEformer
+        # Vanilla transformer with spatio-temporal adaptive embeddings.
+        # Same (batch, nodes, seq_len, input_dim) -> (batch, nodes, horizon, output_dim)
+        # interface as the other backbones; the adjacency argument is ignored.
+        model = STAEformer(
             num_nodes=num_nodes,
             input_dim=input_dim,
             output_dim=output_dim,
             d_model=hidden_dim,
-            num_heads=num_heads,
-            num_layers=num_layers,
-            k_local=k_local,
-            K_global=K_global,
-            seq_len=historical_window,
-            horizon=prediction_horizon,
+            num_heads=4,
+            num_layers=3,
+            d_ff=256,
             dropout=dropout,
-            **kwargs
+            seq_len=historical_window,
+            horizon=prediction_horizon
         )
-    
-    elif model_name == 'stgformer' or model_name.startswith('stgformer_'):
-        # Check if ablation model
-        if model_name.startswith('stgformer_ablation_'):
-            # Note: STGFormer models not included in AccelTraffic (use main codebase)
-            raise NotImplementedError(
-                "STGFormer models not included in AccelTraffic release. "
-                "AccelTraffic includes only: DCRNN, AGCRN, Graph WaveNet, and STGIN."
-            )
-            num_heads = kwargs.pop('num_heads', 4)
-            num_layers = kwargs.pop('num_layers', 2)
-            k_local = kwargs.pop('k_local', 5)
-            K_global = kwargs.pop('K_global', 20)
-            model = create_ablation_model(
-                ablation_type=ablation_type,
-                num_nodes=num_nodes,
-                input_dim=input_dim,
-                output_dim=output_dim,
-                d_model=hidden_dim,
-                num_heads=num_heads,
-                num_layers=num_layers,
-                k_local=k_local,
-                K_global=K_global,
-                seq_len=historical_window,
-                horizon=prediction_horizon,
-                dropout=dropout,
-                **kwargs
-            )
-        else:
-            # Note: STGFormer models not included in AccelTraffic (use main codebase)
-            raise NotImplementedError(
-                "STGFormer models not included in AccelTraffic release. "
-                "AccelTraffic includes only: DCRNN, AGCRN, Graph WaveNet, and STGIN."
-            )
-            num_heads = kwargs.pop('num_heads', 4)
-            num_layers = kwargs.pop('num_layers', 2)
-            k_local = kwargs.pop('k_local', 5)
-            K_global = kwargs.pop('K_global', 20)
-            model = STGFormer(
-                num_nodes=num_nodes,
-                input_dim=input_dim,
-                output_dim=output_dim,
-                d_model=hidden_dim,
-                num_heads=num_heads,
-                num_layers=num_layers,
-                k_local=k_local,
-                K_global=K_global,
-                seq_len=historical_window,
-                horizon=prediction_horizon,
-                dropout=dropout,
-                **kwargs
-            )
-    
+
     else:
         raise ValueError(f"Unknown model: {model_name}. "
-                        f"Choose from: stgin, dcrnn, gwnet, agcrn, stgformer")
-    
+                        f"Choose from: stgin, dcrnn, gwnet, agcrn, staeformer")
+
     return model
 
 
@@ -189,7 +129,7 @@ def get_model_info(model_name):
             'full_name': 'Spatial-Temporal Graph Informed Network',
             'year': 2022,
             'type': 'GCN + Transformer',
-            'description': 'Your enhanced version (use testing_withenhancement.py)',
+            'description': 'Graph + attention model; trained via train_stgin.py (uses spatiotemporal embeddings)',
             'implemented': True,
             'note': 'Different interface - needs spatiotemporal embeddings',
             'citation_count': '~50'
@@ -221,23 +161,14 @@ def get_model_info(model_name):
             'implemented': True,
             'citation_count': '~400'
         },
-        'stgformer': {
-            'name': 'STGFormer',
-            'full_name': 'Spatiotemporal Graph Transformer with Hierarchical Fusion',
-            'year': 2025,
-            'type': 'Transformer + Hierarchical Attention',
-            'description': 'Novel model with 5 innovations: joint attention, dynamic hierarchy, dynamic fusion, ST-PE, parallel processing',
+        'staeformer': {
+            'name': 'STAEformer',
+            'full_name': 'Spatio-Temporal Adaptive Embedding Transformer',
+            'year': 2023,
+            'type': 'Transformer + Adaptive Embeddings',
+            'description': 'Vanilla transformer with learnable spatio-temporal embeddings (no graph convolution)',
             'implemented': True,
-            'citation_count': 'NEW (PhD Thesis)'
-        },
-        'stgformer_v2': {
-            'name': 'STGFormer v2',
-            'full_name': 'Enhanced Spatiotemporal Graph Transformer',
-            'year': 2025,
-            'type': 'Transformer + TCN + Horizon-Aware Decoder',
-            'description': 'Enhanced version with: (1) Temporal convolution, (2) Horizon-aware cross-attention decoder, (3) Shared encoder (NoParallel default), (4) Skip connections',
-            'implemented': True,
-            'citation_count': 'NEW (PhD Thesis)'
+            'citation_count': 'CIKM 2023'
         }
     }
     
@@ -246,7 +177,7 @@ def get_model_info(model_name):
 
 def list_available_models():
     """List all available models"""
-    models = ['stgin', 'dcrnn', 'gwnet', 'agcrn', 'stgformer', 'stgformer_v2']
+    models = ['dcrnn', 'gwnet', 'agcrn', 'staeformer', 'stgin']
     
     print("="*80)
     print("AVAILABLE TRAFFIC PREDICTION MODELS")
