@@ -1,0 +1,4 @@
+control,component_isolated,wins,mean_advantage_pct
+SpeedSpeed,Kinematic content,29/30,21.2
+UnifiedNorm,Dual-channel normalization,30/30,21.5
+AccelOnly,Speed necessity,30/30,38.0

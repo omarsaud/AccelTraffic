@@ -1,0 +1,6 @@
+backbone,METRLA_improve_pct,METRLA_DM,PEMSBAY_improve_pct,PEMSBAY_DM,p_value
+DCRNN,16.4,17.0,8.6,41.0,<0.001
+AGCRN,15.4,14.7,8.0,39.6,<0.001
+GWNET,8.5,10.4,8.2,35.7,<0.001
+STGIN,9.8,10.0,12.6,27.3,<0.001
+STAEformer,9.3,11.7,9.8,33.8,<0.001

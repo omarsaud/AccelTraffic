@@ -1,0 +1,7 @@
+dataset,regime,NoAcc_MAE,AccSG_MAE,improvement_pct
+METR-LA,Free-flow,3.08,2.5,19.7
+METR-LA,Transition,7.94,6.54,18.5
+METR-LA,Congested,7.45,5.63,27.3
+PEMS-BAY,Free-flow,1.29,1.09,16.6
+PEMS-BAY,Transition,4.85,3.99,19.5
+PEMS-BAY,Congested,12.38,10.2,20.8

@@ -1,142 +1,103 @@
-# AccelTraffic: Acceleration-Driven Traffic Speed Prediction
+# AccelTraffic: Acceleration-Enriched Input Preprocessing for Traffic Speed Forecasting
 
 [![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
 [![PyTorch](https://img.shields.io/badge/PyTorch-2.0+-red.svg)](https://pytorch.org/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
-Reference implementation of **acceleration-driven traffic speed prediction** with causal Savitzky--Golay filtering and dual-channel normalization.
+Reference implementation for **"Acceleration-Enriched Input Preprocessing for
+Traffic Speed Forecasting: A Dual-Channel Framework"** (IEEE Transactions on
+Intelligent Transportation Systems, 2026).
 
 ![Conceptual Framework](figures/fig5_conceptual_framework.png)
 
 ## Overview
 
-This repository provides a **model-agnostic preprocessing framework** that integrates acceleration as a causally filtered auxiliary channel with dual-channel normalization for traffic speed prediction. The framework is evaluated on four spatiotemporal graph neural network backbones:
+This repository provides an **architecture-agnostic, input-level preprocessing
+framework** that adds acceleration as a causally filtered auxiliary channel with
+dual-channel normalization for traffic speed forecasting. The framework requires
+no architectural modification and is evaluated on **five** spatiotemporal
+backbones spanning recurrent, adaptive-graph, convolutional, graph-attention, and
+transformer paradigms:
 
-- **DCRNN** - Diffusion Convolutional Recurrent Neural Network ([Li et al., ICLR 2018](https://github.com/liyaguang/DCRNN))
-- **AGCRN** - Adaptive Graph Convolutional Recurrent Network ([Bai et al., NeurIPS 2020](https://github.com/LeiBAI/AGCRN))
-- **STGIN** - Spatial-Temporal Graph Informed Network ([Zou et al.](https://github.com/zouguojian/STGIN))
-- **Graph WaveNet** - Graph WaveNet for Deep Spatial-Temporal Graph Modeling ([Wu et al., IJCAI 2019](https://github.com/nnzhan/Graph-WaveNet))
+- **DCRNN** — Diffusion Convolutional Recurrent Neural Network (Li et al., ICLR 2018)
+- **AGCRN** — Adaptive Graph Convolutional Recurrent Network (Bai et al., NeurIPS 2020)
+- **Graph WaveNet** — Graph WaveNet for Deep Spatial-Temporal Modeling (Wu et al., IJCAI 2019)
+- **STGIN** — Spatio-Temporal Generative Inference Network (Zou et al., 2023)
+- **STAEformer** — Spatio-Temporal Adaptive Embedding Transformer (Liu et al., CIKM 2023)
 
-## Key Contributions
+## Key contributions
 
-1. **Acceleration-aware preprocessing**: Derives acceleration from speed and uses it as an auxiliary input channel (speed-only prediction target)
-2. **Strictly causal Savitzky-Golay filtering**: Data-driven parameter selection (W=13, p=1) avoiding future information leakage
-3. **Per-sensor dual-channel normalization**: Independent normalization for speed and acceleration channels
-4. **Architecture-agnostic evaluation**: Consistent MAE improvements across all four backbones
+1. **Acceleration-aware preprocessing** — derives acceleration from speed and uses it as an auxiliary input channel (the prediction target is speed only).
+2. **Strictly causal Savitzky–Golay filtering** — data-driven parameter selection (W=13, p=1) using only past/present samples (no future leakage).
+3. **Per-sensor dual-channel normalization** — independent z-score statistics for the speed and acceleration channels (train-only).
+4. **Architecture-agnostic validation** — consistent MAE improvements across all five backbones on METR-LA and PEMS-BAY (90 experiments).
+5. **Statistical significance** — Diebold–Mariano tests (all 60 paired comparisons significant at p < 0.001).
+6. **Traffic-science grounding** — comparison against a CTM/LWR physical baseline, a per-regime breakdown, and a mutual-information / Granger-causality analysis.
 
-## Results Summary (Q=12, 60-min horizon)
+## Results summary (Q=12, 60-min horizon, MAE in mph)
 
-### METR-LA Dataset
-
-| Model | NoAcc (Baseline) | Acc_SG (Proposed) | Improvement |
+### METR-LA
+| Model | NoAcc (baseline) | Acc_SG (proposed) | Improvement |
 | ----- | ---------------- | ----------------- | ----------- |
-| AGCRN | 5.05             | 4.27              | -15.4%      |
-| DCRNN | 5.31             | 4.44              | -16.4%      |
-| GWNET | 4.66             | 4.27              | -8.4%       |
-| STGIN | 5.48             | 4.95              | -9.7%       |
+| AGCRN | 5.05 | 4.27 | −15.4% |
+| DCRNN | 5.31 | 4.44 | −16.4% |
+| GWNET | 4.66 | 4.27 | −8.4% |
+| STGIN | 5.48 | 4.95 | −9.7% |
+| STAEformer | 5.46 | 4.95 | −9.3% |
 
-### PEMS-BAY Dataset
-
-| Model | NoAcc (Baseline) | Acc_SG (Proposed) | Improvement |
+### PEMS-BAY
+| Model | NoAcc (baseline) | Acc_SG (proposed) | Improvement |
 | ----- | ---------------- | ----------------- | ----------- |
-| AGCRN | 1.78             | 1.64              | -7.9%       |
-| DCRNN | 1.91             | 1.75              | -8.4%       |
-| GWNET | 1.84             | 1.69              | -8.2%       |
-| STGIN | 2.22             | 1.94              | -10.8%      |
+| AGCRN | 1.78 | 1.64 | −7.9% |
+| DCRNN | 1.91 | 1.75 | −8.4% |
+| GWNET | 1.84 | 1.69 | −8.2% |
+| STGIN | 2.22 | 1.94 | −12.6% |
+| STAEformer | 2.28 | 2.05 | −10.1% |
 
-Full results (72 experiments, 4 models × 2 datasets × 3 horizons × 3 configs) are provided as:
+The full set of 90 experiments (5 models × 2 datasets × 3 horizons × 3 configs)
+and all paper tables are provided in `results/` (see below).
 
-- `results/experiments_72.csv` (per-run table)
-- `results/metrla_ablation.csv` (Table METR-LA)
-- `results/pemsbay_ablation.csv` (Table PEMS-BAY)
-- `results/significance_summary.csv` (paired t-test summary)
-- `results/sg_sensitivity.csv` (SG window sensitivity)
-- `results/timing_table.csv` (training-time overhead)
-
-## Figures
-
-- `figures/fig5_conceptual_framework.png` (conceptual framework)
-- `figures/fig6_baseline_mae.png` (baseline MAE vs horizon)
-- `figures/fig7_acc_sg_improvement.png` (Acc_SG vs Acc_NoSG improvement)
-- `figures/fig8_event_metrla.png` and `figures/fig9_event_pemsbay.png` (case studies)
-- `figures/fig11_timing_comparison.png` (training-time overhead)
-- `figures/fig12_failure_analysis.png` (free-flow regime analysis)
-
-## Repository Structure
+## Repository structure
 
 ```
 AccelTraffic/
-├── models/                    # Model architectures (4 models)
-│   ├── dcrnn_model.py        # DCRNN
-│   ├── agcrn_model.py        # AGCRN
-│   ├── gwnet_model.py        # Graph WaveNet
-│   ├── stgin_model.py        # STGIN
-│   └── model_factory.py      # Model creation utilities
-├── preprocessing/             # Data preprocessing
-│   ├── simple_data_loading.py    # Multi-model loader (DCRNN/GWNET/AGCRN)
-│   ├── stgin_data_loading.py     # STGIN loader (with STE embeddings)
-│   ├── generate_acceleration.py  # Acceleration preprocessing
-│   └── sg_parameter_search.py    # SG filter parameter optimization
-├── utils/                     # Utilities
-│   ├── evaluation_utils.py   # Metrics (MAE, RMSE, MAPE)
-│   ├── model_optimizer.py    # Training optimizations (AMP, TF32)
-│   ├── global_configuration.py # GPU optimizations
-│   └── utils_misc.py         # Seed setting utilities
-├── data/                      # Data files (download required)
-│   ├── metr-la/
-│   │   ├── scaled_speed.npy           # Normalized speed
-│   │   ├── scaled_acceleration.npy    # SG-filtered + normalized acceleration
-│   │   ├── adj_mx.pkl                 # Adjacency matrix
-│   │   └── normalization_params.json  # Statistics
-│   └── pems-bay/
-│       ├── scaled_speed.npy
-│       ├── scaled_acceleration.npy
-│       ├── adj_mx.pkl
-│       └── normalization_params.json
-├── results/                   # Experiment results (72 runs)
-│   ├── experiments_72.csv             # All 72 experiments
-│   ├── metrla_ablation.csv            # METR-LA results
-│   ├── pemsbay_ablation.csv           # PEMS-BAY results
-│   ├── significance_summary.csv       # Statistical tests
-│   ├── timing_table.csv               # Training overhead
-│   └── stats_pairwise_tests_4models.csv
-├── figures/                   # Publication figures
-│   ├── fig5_conceptual_framework.png
-│   ├── fig6_baseline_mae.png
-│   ├── fig7_acc_sg_improvement.png
-│   ├── fig8_event_metrla.png
-│   └── fig9_event_pemsbay.png
-├── train_multimodel.py       # Train DCRNN, AGCRN, GWNET
-├── train_stgin.py            # Train STGIN
-├── SETUP.md                  # Installation guide
+├── models/                       # Five model architectures
+│   ├── dcrnn_model.py
+│   ├── agcrn_model.py
+│   ├── gwnet_model.py
+│   ├── stgin_model.py            # + bridge_trans / st_block / gat / gcn / temporal_attention
+│   ├── staeformer_model.py
+│   └── model_factory.py
+├── preprocessing/                # Acceleration derivation, SG filtering, data loaders
+│   ├── generate_acceleration.py
+│   ├── sg_parameter_search.py
+│   ├── simple_data_loading.py    # DCRNN / GWNET / AGCRN / STAEformer
+│   └── stgin_data_loading.py     # STGIN (with STE embeddings)
+├── analysis/                     # Reproduce the paper's analyses (see analysis/README.md)
+│   ├── diebold_mariano_test.py   # Table VI
+│   ├── regime_breakdown.py       # Table IV
+│   ├── ctm_baseline.py           # Table III
+│   ├── mutual_information.py     # Fig. 6 (MI + Granger)
+│   ├── granger_causality.py      # Fig. 6B (all sensors)
+│   ├── computational_overhead.py
+│   └── ablation_summary.py       # Table VII
+├── results/                      # Paper tables as CSV
+│   ├── main_results.csv          # Table II  (90 rows)
+│   ├── ctm_baseline.csv          # Table III
+│   ├── regime_breakdown.csv      # Table IV
+│   ├── horizon_selection.csv     # Table V
+│   ├── diebold_mariano.csv       # Table VI
+│   ├── component_ablations.csv   # Table VII
+│   └── sg_sensitivity.csv        # Table VIII
+├── figures/                      # Publication figures
+├── utils/                        # Metrics, optimizers, helpers
+├── data/                         # Data files (download required) + normalization params
+├── train_multimodel.py           # Train DCRNN, AGCRN, GWNET, STAEformer
+├── train_stgin.py                # Train STGIN
+├── SETUP.md
+├── LICENSE                       # MIT
 └── README.md
 ```
-
-## Data Loaders
-
-AccelTraffic uses **two different data loaders** depending on the model:
-
-### 1. Simple Data Loader (DCRNN, GWNET, AGCRN)
-
-- **File:** `preprocessing/simple_data_loading.py`
-- **Usage:** Multi-model training script (`train_multimodel.py`)
-- **Features:**
-  - Raw speed + acceleration channels
-  - No spatiotemporal embeddings (STE)
-  - Optimized DataLoader (num_workers, pin_memory, prefetch)
-- **Format:** Returns `(batch, nodes, seq_len, channels)`
-
-### 2. STGIN Data Loader (STGIN only)
-
-- **File:** `preprocessing/stgin_data_loading.py`
-- **Usage:** STGIN training script (`train_stgin.py`)
-- **Features:**
-  - Speed + acceleration channels
-  - **Spatiotemporal embeddings (STE)** - time/day/spatial encoding
-  - STE caching for efficiency
-- **Format:** Returns `(x, y, ste)` where `ste` contains temporal embeddings
-- **Why different:** STGIN architecture requires explicit time/space encodings
-
-**Note:** The two loaders are intentionally separate because STGIN has a fundamentally different architecture that requires STE embeddings for its attention mechanisms.
 
 ## Installation
 
@@ -146,196 +107,140 @@ cd AccelTraffic
 pip install -r requirements.txt
 ```
 
-### Dependencies
-
-- Python >= 3.8
-- PyTorch >= 2.0
-- NumPy, Pandas, SciPy, scikit-learn, h5py
+Requires Python ≥ 3.8 and PyTorch ≥ 2.0 (plus NumPy, Pandas, SciPy, scikit-learn,
+h5py). See [`SETUP.md`](SETUP.md) for a step-by-step guide.
 
 ## Datasets
 
-We use two standard traffic forecasting benchmarks from the [DCRNN repository](https://github.com/liyaguang/DCRNN):
-
-### METR-LA
-
-- **Sensors**: 207 loop detectors on Los Angeles highways
-- **Time Range**: March 2012 - June 2012 (34,272 timesteps)
-- **Interval**: 5 minutes
-- **Features**: Speed (mph)
-
-### PEMS-BAY
-
-- **Sensors**: 325 sensors in the San Francisco Bay Area
-- **Time Range**: January 2017 - May 2017 (52,116 timesteps)
-- **Interval**: 5 minutes
-- **Features**: Speed (mph)
-
-### Dataset Statistics
+Two standard benchmarks from the [DCRNN repository](https://github.com/liyaguang/DCRNN):
 
 | Dataset  | Sensors | Timesteps | Mean speed | Std. speed |
 | -------- | ------- | --------- | ---------- | ---------- |
-| METR-LA  | 207     | 34,272    | 53.7 mph   | 20.3 mph   |
-| PEMS-BAY | 325     | 52,116    | 62.6 mph   | 9.6 mph    |
+| METR-LA  | 207     | 34,272    | 54.4 mph   | 18.4 mph   |
+| PEMS-BAY | 325     | 52,116    | 62.7 mph   | 8.4 mph    |
 
-### Data Download
+(Statistics are per-sensor z-score, computed on the training split only, matching
+the paper.) Both use a 70/10/20 chronological train/validation/test split.
 
-**IMPORTANT:** Data files are **not included** in this repository due to size limitations.
+### Data download
 
-**Option 1: Download Preprocessed (Recommended)**
-Download preprocessed `.npy` files from [Google Drive](https://drive.google.com/...) and extract to `data/metr-la/` and `data/pems-bay/`.
+The raw benchmarks are the standard public datasets released by the DCRNN authors
+and are **not redistributed** here. Download `metr-la.h5` / `pems-bay.h5` and the
+adjacency matrices from the [DCRNN repository](https://github.com/liyaguang/DCRNN),
+place them under `data/<dataset>/`, then generate the acceleration channels:
 
-**Option 2: Generate from Raw Data**
+```bash
+python preprocessing/generate_acceleration.py --dataset metr-la
+python preprocessing/generate_acceleration.py --dataset pems-bay
+```
 
-1. Download raw data from [DCRNN Google Drive](https://drive.google.com/drive/folders/10FOTa6HXPqX8Pf5WRoRwcFnW9BrNZEIX)
-2. Place in `data/metr-la/metr-la.h5` and `data/pems-bay/pems-bay.h5`
-3. Generate acceleration channels:
-   ```bash
-   python preprocessing/generate_acceleration.py --dataset metr-la
-   python preprocessing/generate_acceleration.py --dataset pems-bay
-   ```
-
-**See [`data/README.md`](data/README.md) for detailed instructions.**
+This writes the speed/acceleration `.npy` files and the per-sensor **train-only**
+normalization that matches the paper. See [`data/README.md`](data/README.md) for details.
 
 ## Training
 
-### Train DCRNN, AGCRN, or Graph WaveNet
+### DCRNN, AGCRN, Graph WaveNet, STAEformer
 
 ```bash
-# Train with acceleration (Acc_SG - uses preprocessed SG-filtered data)
+# Proposed (speed + causally SG-filtered acceleration)
 python train_multimodel.py --model agcrn --dataset metr-la --Q 12 --use_acceleration true --epochs 100
 
-# Train without acceleration (NoAcc baseline)
+# Speed-only baseline
 python train_multimodel.py --model agcrn --dataset metr-la --Q 12 --use_acceleration false --epochs 100
 ```
 
-**Available models:** `dcrnn`, `gwnet`, `agcrn`
-**Available datasets:** `metr-la`, `pems-bay`
-**Prediction horizons (Q):** `3` (15 min), `6` (30 min), `12` (60 min)
+**Models:** `dcrnn`, `gwnet`, `agcrn`, `staeformer` · **Datasets:** `metr-la`, `pems-bay` · **Horizons (Q):** `3` (15 min), `6` (30 min), `12` (60 min).
 
-### Train STGIN
+### STGIN
 
 ```bash
-python train_stgin.py --Q 12 --use_acceleration true --batch_size 32 --epochs 100
+python train_stgin.py --Q 12 --use_acceleration true --epochs 100
 ```
 
-### Configuration Options
+### Configurations
 
-| Config     | Channels | Command Flag                 | Description                                          |
-| ---------- | -------- | ---------------------------- | ---------------------------------------------------- |
-| `NoAcc`  | 1        | `--use_acceleration false` | Speed-only baseline                                  |
-| `Acc_SG` | 2        | `--use_acceleration true`  | Speed + causally SG-filtered acceleration (proposed) |
+| Config | Channels | Description |
+| ------ | -------- | ----------- |
+| `NoAcc`    | 1 | Speed-only baseline |
+| `Acc_NoSG` | 2 | Speed + raw (unfiltered) acceleration |
+| `Acc_SG`   | 2 | Speed + causally SG-filtered acceleration (**proposed**) |
 
-**Note:** SG filtering is applied during preprocessing. Using `--use_acceleration true` automatically loads the preprocessed SG-filtered acceleration data from `data/<dataset>/scaled_acceleration.npy`.
+`Acc_SG` loads the preprocessed SG-filtered acceleration; `Acc_NoSG` uses the raw
+finite-difference acceleration (point the loader to the unfiltered data).
 
-## Preprocessing Framework
+## Reproducing the analyses
 
-### 1. Acceleration Derivation
+After training the relevant runs, the scripts in `analysis/` reproduce the
+paper's analyses (significance, physical baseline, regime breakdown,
+information-theoretic tests, overhead). See [`analysis/README.md`](analysis/README.md).
 
-Acceleration is computed as the temporal derivative of speed:
+## Preprocessing framework
+
+**Acceleration** is the backward finite difference of speed,
+`a[t] = (speed[t] − speed[t−1]) / Δt` (Δt = 300 s), serving only as an auxiliary
+input. A **strictly causal Savitzky–Golay filter** (W=13, p=1) smooths it using
+only past/present samples:
 
 ```python
-acceleration[t] = (speed[t] - speed[t-1]) / dt  # dt = 300 seconds
-```
-
-**Critical**: Acceleration serves exclusively as an auxiliary input feature. The prediction target is speed only.
-
-### 2. Causal Savitzky-Golay Filter
-
-The framework applies a **strictly causal** SG filter (W=13, p=1) to raw acceleration using only past and present samples:
-
-```python
-from scipy.signal import savgol_filter
 import numpy as np
 
 def causal_sg_filter(signal, window_length=13, polyorder=1):
-    # Pad future with edge values to make filter causal
-    padded = np.pad(signal, (0, window_length-1), mode='edge')
-    filtered = savgol_filter(padded, window_length, polyorder)
-    return filtered[:len(signal)]  # Truncate to original length
+    """Strictly causal Savitzky-Golay: fit a polynomial to each backward-looking
+    window and evaluate it at the most recent sample, using only past/present data.
+    NOTE: do NOT use scipy.signal.savgol_filter here -- it is centered and leaks
+    future data. See preprocessing/generate_acceleration.py for the implementation."""
+    n = len(signal)
+    out = np.empty(n)
+    for t in range(n):
+        w = signal[max(0, t - window_length + 1): t + 1]   # backward window ending at t
+        coeffs = np.polyfit(np.arange(len(w)), w, min(polyorder, len(w) - 1))
+        out[t] = np.polyval(coeffs, len(w) - 1)            # value at the most recent point
+    return out
 ```
 
-### SG Parameter Selection
-
-To find optimal SG parameters for your dataset:
-
-```bash
-python preprocessing/sg_parameter_search.py --dataset metr-la --horizon 12
-```
-
-**Selection Criterion**: Maximize correlation of filtered acceleration with future speed (predictive power).
-
-| Parameter      | Search Range     | Optimal      |
-| -------------- | ---------------- | ------------ |
-| Window (W)     | 7, 9, 11, 13, 15 | **13** |
-| Polynomial (p) | 1, 2, 3          | **1**  |
-
-Parameter selection is performed on training data to ensure fair evaluation.
-
-### 3. Dual-Channel Normalization
-
-Per-sensor z-score normalization is applied independently to each channel:
-
-**METR-LA (from `data/metr_la_normalization.json`):**
-
-| Channel      | Mean (μ) | Std (σ) | Unit  |
-| ------------ | --------- | -------- | ----- |
-| Speed        | 53.72     | 20.26    | mph   |
-| Acceleration | ≈0       | 0.0086   | m/s² |
-
-**PEMS-BAY (from `data/pems_bay_normalization.json`):**
-
-| Channel      | Mean (μ) | Std (σ) | Unit  |
-| ------------ | --------- | -------- | ----- |
-| Speed        | 62.62     | 9.59     | mph   |
-| Acceleration | ≈0       | 0.0034   | m/s² |
+SG parameters are selected by grid search over W ∈ {7, 9, 11, 13, 15, 17} and
+p ∈ {1, 2, 3} on the training data (optimal: **W=13, p=1**, see
+`results/sg_sensitivity.csv`). **Dual-channel normalization** then applies
+independent per-sensor z-score statistics to the speed and acceleration channels,
+computed from the training split only.
 
 ## Evaluation
 
-### Metrics
-
-- **MAE** (Mean Absolute Error): Primary metric (mph)
-- **RMSE** (Root Mean Squared Error): Sensitivity to large errors
-- **MAPE** (Mean Absolute Percentage Error): Relative error (%)
-
-### Prediction Horizons
-
-- **Q=3**: 15 minutes ahead
-- **Q=6**: 30 minutes ahead
-- **Q=12**: 60 minutes ahead
-
-### Statistical Significance
-
-All comparisons tested with paired t-tests. See:
-
-- `results/significance_summary.csv` (summary table)
-- `results/stats_pairwise_tests_4models.csv` (full paired-test export for the 4 models)
+MAE (primary, mph), RMSE (mph), and MAPE (%), reported at horizons of 15, 30, and
+60 minutes. Statistical significance is established with the **Diebold–Mariano
+test** (`results/diebold_mariano.csv`).
 
 ## Citation
 
-If you find this work useful, please cite the associated paper:
-
 ```bibtex
-@article{abahussen2025acceleration,
-  title={Acceleration-Driven Deep Learning for Traffic Speed Prediction with Causal Filtering and Dual-Channel Normalization},
-  author={Aba Hussen, Omar S. and Hashim, Shaiful J. and Samsudin, Khairulmizam and Shafri, Helmi Z. M.},
-  year={2025}
+@article{abahussen2026acceleration,
+  title   = {Acceleration-Enriched Input Preprocessing for Traffic Speed
+             Forecasting: A Dual-Channel Framework},
+  author  = {Aba Hussen, Omar S. and Hashim, Shaiful J. and
+             Samsudin, Khairulmizam and Shafri, Helmi Z. M.},
+  journal = {IEEE Transactions on Intelligent Transportation Systems},
+  year    = {2026}
 }
 ```
 
+## License
+
+Released under the [MIT License](LICENSE). The METR-LA and PEMS-BAY datasets are
+provided by the DCRNN authors under their respective terms.
+
 ## Acknowledgments
 
-This work builds upon the following open-source implementations:
-
-- [DCRNN](https://github.com/liyaguang/DCRNN) - Li et al., ICLR 2018
-- [AGCRN](https://github.com/LeiBAI/AGCRN) - Bai et al., NeurIPS 2020
-- [Graph WaveNet](https://github.com/nnzhan/Graph-WaveNet) - Wu et al., IJCAI 2019
-- [STGIN](https://github.com/zouguojian/STGIN) - Zou et al.
-
-Datasets (METR-LA and PEMS-BAY) are provided by the DCRNN authors.
+This work builds on the open-source implementations of
+[DCRNN](https://github.com/liyaguang/DCRNN),
+[AGCRN](https://github.com/LeiBAI/AGCRN),
+[Graph WaveNet](https://github.com/nnzhan/Graph-WaveNet),
+[STGIN](https://github.com/zouguojian/STGIN), and
+[STAEformer](https://github.com/XDZhelheim/STAEformer).
 
 ## Contact
 
-- **Omar S. Aba Hussen** - Omarabahussen@gmail.com
-- **Shaiful J. Hashim** - sjh@upm.edu.my
+- **Omar S. Aba Hussen** — Omarabahussen@gmail.com
+- **Shaiful J. Hashim** — sjh@upm.edu.my
 
-Department of Computer and Communication Systems, Faculty of Engineering, Universiti Putra Malaysia (UPM)
+Department of Computer and Communication Systems, Faculty of Engineering,
+Universiti Putra Malaysia (UPM).
