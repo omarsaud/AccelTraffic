@@ -5,8 +5,10 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
 Reference implementation for **"Acceleration-Enriched Input Preprocessing for
-Traffic Speed Forecasting: A Dual-Channel Framework"** (IEEE Transactions on
-Intelligent Transportation Systems, 2026).
+Traffic Speed Forecasting: A Dual-Channel Framework"** (manuscript under review at
+IEEE Transactions on Intelligent Transportation Systems).
+
+> **Status:** Manuscript under review at IEEE T-ITS. The citation below will be updated upon acceptance.
 
 ![Conceptual Framework](figures/fig5_conceptual_framework.png)
 
@@ -213,12 +215,13 @@ test** (`results/diebold_mariano.csv`).
 ## Citation
 
 ```bibtex
-@article{abahussen2026acceleration,
+@unpublished{abahussen2026acceleration,
   title   = {Acceleration-Enriched Input Preprocessing for Traffic Speed
              Forecasting: A Dual-Channel Framework},
   author  = {Aba Hussen, Omar S. and Hashim, Shaiful J. and
              Samsudin, Khairulmizam and Shafri, Helmi Z. M.},
-  journal = {IEEE Transactions on Intelligent Transportation Systems},
+  note    = {Manuscript under review, IEEE Transactions on Intelligent
+             Transportation Systems},
   year    = {2026}
 }
 ```
