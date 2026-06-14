@@ -58,12 +58,13 @@ the paper). It produces `scaled_speed.npy`, `scaled_acceleration.npy`, and
 ## Citations
 
 ```bibtex
-@article{abahussen2026acceleration,
+@unpublished{abahussen2026acceleration,
   title   = {Acceleration-Enriched Input Preprocessing for Traffic Speed
              Forecasting: A Dual-Channel Framework},
   author  = {Aba Hussen, Omar S. and Hashim, Shaiful J. and
              Samsudin, Khairulmizam and Shafri, Helmi Z. M.},
-  journal = {IEEE Transactions on Intelligent Transportation Systems},
+  note    = {Manuscript under review, IEEE Transactions on Intelligent
+             Transportation Systems},
   year    = {2026}
 }
 
