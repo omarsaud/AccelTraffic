@@ -3,12 +3,15 @@
 [![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
 [![PyTorch](https://img.shields.io/badge/PyTorch-2.0+-red.svg)](https://pytorch.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+[![DOI](https://img.shields.io/badge/DOI-10.1109%2FTITS.2026.3708746-blue.svg)](https://doi.org/10.1109/TITS.2026.3708746)
 
 Reference implementation for **"Acceleration-Enriched Input Preprocessing for
-Traffic Speed Forecasting: A Dual-Channel Framework"** (manuscript under review at
-IEEE Transactions on Intelligent Transportation Systems).
+Traffic Speed Forecasting: A Dual-Channel Framework"**, published in
+IEEE Transactions on Intelligent Transportation Systems.
 
-> **Status:** Manuscript under review at IEEE T-ITS. The citation below will be updated upon acceptance.
+> **Status:** Published in IEEE T-ITS (Early Access).
+> [DOI: 10.1109/TITS.2026.3708746](https://doi.org/10.1109/TITS.2026.3708746) ·
+> [IEEE Xplore](https://ieeexplore.ieee.org/document/11599833)
 
 ![Conceptual Framework](figures/fig5_conceptual_framework.png)
 
@@ -215,14 +218,16 @@ test** (`results/diebold_mariano.csv`).
 ## Citation
 
 ```bibtex
-@unpublished{abahussen2026acceleration,
+@article{abahussen2026acceleration,
   title   = {Acceleration-Enriched Input Preprocessing for Traffic Speed
              Forecasting: A Dual-Channel Framework},
   author  = {Aba Hussen, Omar S. and Hashim, Shaiful J. and
              Samsudin, Khairulmizam and Shafri, Helmi Z. M.},
-  note    = {Manuscript under review, IEEE Transactions on Intelligent
-             Transportation Systems},
-  year    = {2026}
+  journal = {IEEE Transactions on Intelligent Transportation Systems},
+  year    = {2026},
+  issn    = {1558-0016},
+  doi     = {10.1109/TITS.2026.3708746},
+  note    = {Early Access}
 }
 ```
 
